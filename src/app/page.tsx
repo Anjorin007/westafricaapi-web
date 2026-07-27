@@ -582,13 +582,29 @@ function InteractiveTerminal() {
     setUrl(`GET ${path}`);
     setLoading(true);
     setResponse("");
-    try {
-      const res = await fetch(`${API_URL}${path}`);
-      const json = await res.json();
-      setResponse(JSON.stringify(json, null, 2));
-    } catch {
-      setResponse('{ "error": "Impossible de joindre l\'API" }');
+
+    const attempt = async () => {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 25000);
+      try {
+        const res = await fetch(`${API_URL}${path}`, { signal: controller.signal });
+        clearTimeout(timeout);
+        return await res.json();
+      } catch {
+        clearTimeout(timeout);
+        return null;
+      }
+    };
+
+    let json = await attempt();
+    if (!json) {
+      // Render cold start — retry once after 3s
+      setResponse('{ "status": "Démarrage du serveur..." }');
+      await new Promise(r => setTimeout(r, 3000));
+      json = await attempt();
     }
+
+    setResponse(json ? JSON.stringify(json, null, 2) : '{ "error": "Serveur indisponible — réessaie dans 30s" }');
     setLoading(false);
   }, []);
 
