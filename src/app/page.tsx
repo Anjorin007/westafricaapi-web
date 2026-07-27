@@ -318,57 +318,104 @@ interface TickerItem {
   flag?: string;
 }
 
-// Valeurs hardcodées de référence pour les taux de change
 const FX_FALLBACK = {
   xof_usd: 605.2,
   xof_eur: 655.96,
   ghs_usd: 14.85,
   ngn_usd: 1542,
+  gmd_usd: 72.1,
+  cve_usd: 102.4,
+  lrd_usd: 192.5,
+  gnf_usd: 8610,
+  sle_usd: 22.5,
+  bceao_rate: 3.50,
 };
 
 function LiveTicker() {
   const [items, setItems] = useState<TickerItem[]>([]);
   const [fxRates, setFxRates] = useState({ ...FX_FALLBACK });
 
-  // Fetch des taux de change live depuis l'API economy
   useEffect(() => {
     async function fetchFxRates() {
       const rates = { ...FX_FALLBACK };
 
-      const [snResult, ghResult, ngResult] = await Promise.allSettled([
+      const results = await Promise.allSettled([
         fetch(`${API_URL}/v1/economy/SN`),
         fetch(`${API_URL}/v1/economy/GH`),
         fetch(`${API_URL}/v1/economy/NG`),
+        fetch(`${API_URL}/v1/economy/GM`),
+        fetch(`${API_URL}/v1/economy/CV`),
+        fetch(`${API_URL}/v1/economy/LR`),
+        fetch(`${API_URL}/v1/economy/GN`),
+        fetch(`${API_URL}/v1/economy/SL`),
       ]);
+      const [snRes, ghRes, ngRes, gmRes, cvRes, lrRes, gnRes, slRes] = results;
+
+      const pick = (ind: Record<string, {value: number}>, ...keys: string[]) => {
+        for (const k of keys) if (ind[k]?.value != null) return Number(ind[k].value);
+        return null;
+      };
 
       try {
-        if (snResult.status === "fulfilled" && snResult.value.ok) {
-          const data = await snResult.value.json();
-          const ind = data.indicators || {};
-          const xofUsd = ind.bceao_fx_xof_usd?.value ?? ind.fx_xof_usd?.value ?? null;
-          const xofEur = ind.bceao_fx_xof_eur?.value ?? ind.fx_xof_eur?.value ?? null;
-          if (xofUsd != null) rates.xof_usd = Number(xofUsd);
-          if (xofEur != null) rates.xof_eur = Number(xofEur);
+        if (snRes.status === "fulfilled" && snRes.value.ok) {
+          const ind = (await snRes.value.json()).indicators || {};
+          const v1 = pick(ind, "bceao_fx_xof_usd", "fx_xof_usd");
+          const v2 = pick(ind, "bceao_fx_xof_eur", "fx_xof_eur");
+          const v3 = pick(ind, "bceao_policy_rate", "policy_rate");
+          if (v1) rates.xof_usd = v1;
+          if (v2) rates.xof_eur = v2;
+          if (v3) rates.bceao_rate = v3;
         }
-      } catch { /* garder fallback */ }
-
+      } catch { /* fallback */ }
       try {
-        if (ghResult.status === "fulfilled" && ghResult.value.ok) {
-          const data = await ghResult.value.json();
-          const ind = data.indicators || {};
-          const ghsUsd = ind.bog_fx_usd_ghs?.value ?? ind.fx_usd_ghs?.value ?? null;
-          if (ghsUsd != null) rates.ghs_usd = Number(ghsUsd);
+        if (ghRes.status === "fulfilled" && ghRes.value.ok) {
+          const ind = (await ghRes.value.json()).indicators || {};
+          const v = pick(ind, "bog_fx_usd_ghs", "fx_usd_ghs");
+          if (v) rates.ghs_usd = v;
         }
-      } catch { /* garder fallback */ }
-
+      } catch { /* fallback */ }
       try {
-        if (ngResult.status === "fulfilled" && ngResult.value.ok) {
-          const data = await ngResult.value.json();
-          const ind = data.indicators || {};
-          const ngnUsd = ind.cbn_fx_usd_ngn?.value ?? ind.fx_usd_ngn?.value ?? null;
-          if (ngnUsd != null) rates.ngn_usd = Number(ngnUsd);
+        if (ngRes.status === "fulfilled" && ngRes.value.ok) {
+          const ind = (await ngRes.value.json()).indicators || {};
+          const v = pick(ind, "cbn_fx_usd_ngn", "fx_usd_ngn");
+          if (v) rates.ngn_usd = v;
         }
-      } catch { /* garder fallback */ }
+      } catch { /* fallback */ }
+      try {
+        if (gmRes.status === "fulfilled" && gmRes.value.ok) {
+          const ind = (await gmRes.value.json()).indicators || {};
+          const v = pick(ind, "cbg_fx_usd_gmd", "fx_usd_gmd");
+          if (v) rates.gmd_usd = v;
+        }
+      } catch { /* fallback */ }
+      try {
+        if (cvRes.status === "fulfilled" && cvRes.value.ok) {
+          const ind = (await cvRes.value.json()).indicators || {};
+          const v = pick(ind, "bcv_fx_usd_cve", "fx_usd_cve");
+          if (v) rates.cve_usd = v;
+        }
+      } catch { /* fallback */ }
+      try {
+        if (lrRes.status === "fulfilled" && lrRes.value.ok) {
+          const ind = (await lrRes.value.json()).indicators || {};
+          const v = pick(ind, "cbl_fx_usd_lrd", "fx_usd_lrd");
+          if (v) rates.lrd_usd = v;
+        }
+      } catch { /* fallback */ }
+      try {
+        if (gnRes.status === "fulfilled" && gnRes.value.ok) {
+          const ind = (await gnRes.value.json()).indicators || {};
+          const v = pick(ind, "bcrg_fx_usd_gnf", "fx_usd_gnf");
+          if (v) rates.gnf_usd = v;
+        }
+      } catch { /* fallback */ }
+      try {
+        if (slRes.status === "fulfilled" && slRes.value.ok) {
+          const ind = (await slRes.value.json()).indicators || {};
+          const v = pick(ind, "bsl_fx_usd_sle", "fx_usd_sle");
+          if (v) rates.sle_usd = v;
+        }
+      } catch { /* fallback */ }
 
       setFxRates(rates);
     }
@@ -418,26 +465,35 @@ function LiveTicker() {
       const xofEurVal = fmtXof(fxRates.xof_eur);
       const ghsVal    = fmtGhs(fxRates.ghs_usd);
       const ngnVal    = fmtNgn(fxRates.ngn_usd);
+      const gmdVal    = fxRates.gmd_usd.toFixed(1);
+      const cveVal    = fxRates.cve_usd.toFixed(1);
+      const lrdVal    = fxRates.lrd_usd.toFixed(1);
+      const gnfVal    = Math.round(fxRates.gnf_usd).toLocaleString("en-US");
+      const sleVal    = fxRates.sle_usd.toFixed(1);
+      const bceaoVal  = `${fxRates.bceao_rate.toFixed(2)}%`;
+
+      const gmdTrend = trendFor(fxRates.gmd_usd, FX_FALLBACK.gmd_usd);
+      const cveTrend = trendFor(fxRates.cve_usd, FX_FALLBACK.cve_usd);
+      const lrdTrend = trendFor(fxRates.lrd_usd, FX_FALLBACK.lrd_usd);
+      const gnfTrend = trendFor(fxRates.gnf_usd, FX_FALLBACK.gnf_usd);
+      const sleTrend = trendFor(fxRates.sle_usd, FX_FALLBACK.sle_usd);
 
       const base: TickerItem[] = [
-        // Taux de change — 15 pays
-        { label: "XOF/USD", value: xofUsdVal, trend: xofUsdTrend, flag: "sn" },
-        { label: "XOF/EUR", value: xofEurVal, trend: xofEurTrend, flag: "ci" },
-        { label: "GHS/USD", value: ghsVal,    trend: ghsTrend,    flag: "gh" },
-        { label: "NGN/USD", value: ngnVal,    trend: ngnTrend,    flag: "ng" },
-        { label: "GMD/USD", value: "72.1",    trend: "neutral",   flag: "gm" },
-        { label: "CVE/USD", value: "102.4",   trend: "neutral",   flag: "cv" },
-        { label: "LRD/USD", value: "192.5",   trend: "down",      flag: "lr" },
-        { label: "GNF/USD", value: "8,610",   trend: "down",      flag: "gn" },
-        { label: "SLE/USD", value: "22.5",    trend: "down",      flag: "sl" },
-        // Taux directeur
-        { label: "Taux BCEAO", value: "3.50%", trend: "neutral", flag: "bf" },
-        // Devise fixe UEMOA
-        { label: "XOF/USD", value: xofUsdVal, trend: xofUsdTrend, flag: "ml" },
-        { label: "XOF/USD", value: xofUsdVal, trend: xofUsdTrend, flag: "ne" },
-        { label: "XOF/USD", value: xofUsdVal, trend: xofUsdTrend, flag: "tg" },
-        { label: "XOF/USD", value: xofUsdVal, trend: xofUsdTrend, flag: "bj" },
-        { label: "XOF/USD", value: xofUsdVal, trend: xofUsdTrend, flag: "gw" },
+        { label: "XOF/USD",    value: xofUsdVal, trend: xofUsdTrend, flag: "sn" },
+        { label: "XOF/EUR",    value: xofEurVal, trend: xofEurTrend, flag: "ci" },
+        { label: "GHS/USD",    value: ghsVal,    trend: ghsTrend,    flag: "gh" },
+        { label: "NGN/USD",    value: ngnVal,    trend: ngnTrend,    flag: "ng" },
+        { label: "GMD/USD",    value: gmdVal,    trend: gmdTrend,    flag: "gm" },
+        { label: "CVE/USD",    value: cveVal,    trend: cveTrend,    flag: "cv" },
+        { label: "LRD/USD",    value: lrdVal,    trend: lrdTrend,    flag: "lr" },
+        { label: "GNF/USD",    value: gnfVal,    trend: gnfTrend,    flag: "gn" },
+        { label: "SLE/USD",    value: sleVal,    trend: sleTrend,    flag: "sl" },
+        { label: "Taux BCEAO", value: bceaoVal,  trend: "neutral",   flag: "bf" },
+        { label: "XOF/USD",    value: xofUsdVal, trend: xofUsdTrend, flag: "ml" },
+        { label: "XOF/USD",    value: xofUsdVal, trend: xofUsdTrend, flag: "ne" },
+        { label: "XOF/USD",    value: xofUsdVal, trend: xofUsdTrend, flag: "tg" },
+        { label: "XOF/USD",    value: xofUsdVal, trend: xofUsdTrend, flag: "bj" },
+        { label: "XOF/USD",    value: xofUsdVal, trend: xofUsdTrend, flag: "gw" },
       ];
 
       setItems([...base, ...entries]);
@@ -1617,35 +1673,44 @@ function PlatformStats() {
   const [stats, setStats] = useState<{
     observations: number;
     countries: number;
+    indicators: number;
+    sources: number;
     lastUpdate: string;
   } | null>(null);
 
   useEffect(() => {
     async function load() {
       try {
-        const res = await fetch(`${API_URL}/v1/platform/stats`);
-        if (!res.ok) return;
-        const s = await res.json();
+        const [platformRes, indicatorsRes, etlRes] = await Promise.allSettled([
+          fetch(`${API_URL}/v1/platform/stats`),
+          fetch(`${API_URL}/v1/indicators?limit=1`),
+          fetch(`${API_URL}/v1/platform/etl-status`),
+        ]);
 
+        let observations = 15866, countries = 15, indicators = 411, sources = 255;
         let lastUpdate = "< 24h";
-        try {
-          const etlRes = await fetch(`${API_URL}/v1/platform/etl-status`);
-          if (etlRes.ok) {
-            const etl = await etlRes.json();
-            if (etl.last_run) {
-              const ago = Math.round((Date.now() - new Date(etl.last_run).getTime()) / 3600000);
-              lastUpdate = ago < 1 ? "< 1h" : `${ago}h`;
-            }
-          }
-        } catch { /* ignore */ }
 
-        setStats({
-          observations: s.total_observations || 15866,
-          countries: s.total_countries || 15,
-          lastUpdate,
-        });
+        if (platformRes.status === "fulfilled" && platformRes.value.ok) {
+          const s = await platformRes.value.json();
+          if (s.total_observations) observations = s.total_observations;
+          if (s.total_countries) countries = s.total_countries;
+          if (s.total_sources) sources = s.total_sources;
+        }
+        if (indicatorsRes.status === "fulfilled" && indicatorsRes.value.ok) {
+          const s = await indicatorsRes.value.json();
+          if (s.total) indicators = s.total;
+        }
+        if (etlRes.status === "fulfilled" && etlRes.value.ok) {
+          const etl = await etlRes.value.json();
+          if (etl.last_run) {
+            const ago = Math.round((Date.now() - new Date(etl.last_run).getTime()) / 3600000);
+            lastUpdate = ago < 1 ? "< 1h" : `${ago}h`;
+          }
+        }
+
+        setStats({ observations, countries, indicators, sources, lastUpdate });
       } catch {
-        setStats({ observations: 15866, countries: 15, lastUpdate: "< 24h" });
+        setStats({ observations: 15866, countries: 15, indicators: 411, sources: 255, lastUpdate: "< 24h" });
       }
     }
     load();
@@ -1654,10 +1719,10 @@ function PlatformStats() {
   if (!stats) return null;
 
   const counters = [
-    { value: 411, suffix: "", label: "Indicateurs" },
+    { value: stats.indicators, suffix: "", label: "Indicateurs" },
     { value: stats.observations, suffix: "", label: "Observations" },
-    { value: 15, suffix: "", label: "Pays couverts" },
-    { value: 255, suffix: "+", label: "Sources" },
+    { value: stats.countries, suffix: "", label: "Pays couverts" },
+    { value: stats.sources, suffix: "+", label: "Sources" },
   ];
 
   return (
