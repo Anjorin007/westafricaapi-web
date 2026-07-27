@@ -1,6 +1,5 @@
 "use client";
 
-import { useUser } from "@clerk/nextjs";
 import { useState, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
@@ -266,8 +265,6 @@ function ApiKeyGate({
 // --- Page principale ---
 
 export default function DashboardPage() {
-  const { user } = useUser();
-
   const [apiKey, setApiKey] = useState<string | null>(null);
   const [keys, setKeys] = useState<ApiKey[]>([]);
   const [me, setMe] = useState<MeData | null>(null);
@@ -424,10 +421,7 @@ export default function DashboardPage() {
             <div>
               <h1 className="text-base font-bold text-white">Dashboard</h1>
               <p className="text-xs text-teal-300/50 mt-0.5">
-                {me?.name ||
-                  user?.firstName ||
-                  user?.emailAddresses[0]?.emailAddress?.split("@")[0] ||
-                  "Développeur"}
+                {me?.name || "Développeur"}
               </p>
             </div>
           </div>

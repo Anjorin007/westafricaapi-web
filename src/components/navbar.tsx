@@ -4,7 +4,6 @@ import Link from "next/link";
 import { useState, useEffect } from "react";
 import { Menu, X, ChevronDown, Database, Gavel, BarChart3, Landmark, Vote, Ship } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { useAuth, UserButton } from "@clerk/nextjs";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { Logo } from "@/components/logo";
@@ -26,7 +25,6 @@ const NAV_LINKS = [
 ];
 
 export function Navbar() {
-  const { isSignedIn } = useAuth();
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [productsOpen, setProductsOpen] = useState(false);
@@ -114,35 +112,21 @@ export function Navbar() {
 
           {/* Actions */}
           <div className="hidden lg:flex items-center gap-3">
-            {!isSignedIn ? (
-              <>
-                <Link
-                  href="/sign-in"
-                  className="text-sm font-medium text-white/70 hover:text-white transition-colors px-3 py-2"
-                >
-                  Connexion
-                </Link>
-                <Link
-                  href="/sign-up"
-                  className={cn(
-                    buttonVariants({ size: "sm" }),
-                    "bg-white text-[#1e2060] hover:bg-white/90 font-semibold shadow-lg shadow-white/10"
-                  )}
-                >
-                  Obtenir une clé API
-                </Link>
-              </>
-            ) : (
-              <>
-                <Link
-                  href="/dashboard"
-                  className="text-sm font-medium text-white/70 hover:text-white transition-colors px-3 py-2"
-                >
-                  Dashboard
-                </Link>
-                <UserButton />
-              </>
-            )}
+            <Link
+              href="/dashboard"
+              className="text-sm font-medium text-white/70 hover:text-white transition-colors px-3 py-2"
+            >
+              Dashboard
+            </Link>
+            <Link
+              href="/dashboard"
+              className={cn(
+                buttonVariants({ size: "sm" }),
+                "bg-white text-[#1e2060] hover:bg-white/90 font-semibold shadow-lg shadow-white/10"
+              )}
+            >
+              Obtenir une clé API
+            </Link>
           </div>
 
           {/* Mobile toggle */}
@@ -187,28 +171,16 @@ export function Navbar() {
                 Pricing
               </Link>
               <div className="pt-4 flex flex-col gap-2">
-                {!isSignedIn ? (
-                  <>
-                    <Link href="/sign-in" className="text-sm text-center text-white/70 py-2">
-                      Connexion
-                    </Link>
-                    <Link
-                      href="/sign-up"
-                      className={cn(buttonVariants({ size: "lg" }), "w-full justify-center bg-white text-[#1e2060] hover:bg-white/90 font-semibold")}
-                    >
-                      Obtenir une clé API
-                    </Link>
-                  </>
-                ) : (
-                  <>
-                    <Link href="/dashboard" className="text-sm text-center text-white/70 py-2">
-                      Dashboard
-                    </Link>
-                    <div className="flex justify-center pt-2">
-                      <UserButton />
-                    </div>
-                  </>
-                )}
+                <Link href="/dashboard" className="text-sm text-center text-white/70 py-2" onClick={() => setOpen(false)}>
+                  Dashboard
+                </Link>
+                <Link
+                  href="/dashboard"
+                  className={cn(buttonVariants({ size: "lg" }), "w-full justify-center bg-white text-[#1e2060] hover:bg-white/90 font-semibold")}
+                  onClick={() => setOpen(false)}
+                >
+                  Obtenir une clé API
+                </Link>
               </div>
             </div>
           </motion.div>
