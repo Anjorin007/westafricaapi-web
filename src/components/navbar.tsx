@@ -8,21 +8,18 @@ import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { Logo } from "@/components/logo";
 
-// Les 6 vrais produits API — badge "API"
+// Dans "Plus" : uniquement ce qui N'est PAS déjà en lien direct
+// Produits API non exposés en direct
 const API_PRODUCTS = [
-  { href: "/data",       label: "Data API",       desc: "PIB, inflation, population, énergie",   icon: BarChart3,   color: "teal" },
-  { href: "/markets",    label: "Markets API",     desc: "Taux de change, BCEAO, BRVM",           icon: TrendingUp,  color: "violet" },
-  { href: "/trade",      label: "Trade API",       desc: "Douanes, codes SH, TEC-CEDEAO",         icon: Ship,        color: "indigo" },
   { href: "/compliance", label: "Compliance API",  desc: "Fiscalité, réglementations douanières", icon: Scale,       color: "amber" },
   { href: "/identity",   label: "Identity API",    desc: "RCCM, NINEA, IFU, registres",           icon: Fingerprint, color: "rose" },
   { href: "/ai",         label: "AI API",          desc: "Q&R, résumés PDF, recherche RAG",       icon: Sparkles,    color: "sky" },
 ];
 
-// Les pages de contenu dans "Plus"
+// Pages de contenu non exposées en direct
 const MORE_LINKS = [
-  { href: "/tenders",    label: "Appels d'offres", desc: "Marchés publics · 15 pays",   icon: Gavel },
-  { href: "/government", label: "Gouvernement",    desc: "Leaders, cabinets, institutions", icon: Landmark },
-  { href: "/elections",  label: "Élections",       desc: "Résultats, calendrier régional",  icon: Vote },
+  { href: "/government", label: "Gouvernement", desc: "Leaders, cabinets, institutions",  icon: Landmark },
+  { href: "/elections",  label: "Élections",    desc: "Résultats, calendrier régional",   icon: Vote },
 ];
 
 const ICON_COLORS: Record<string, string> = {
