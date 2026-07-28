@@ -799,7 +799,8 @@ const TERMINAL_SCENARIOS = [
     label: "Économie",
     code: `curl https://api.westafricaapi.com/v1/economy/SN \\
   -H "Authorization: Bearer waa_live_sk_••••••••••••"`,
-    response: `{
+    apiPath: "/v1/economy/SN",
+    fallback: `{
   "country": "Sénégal",
   "gdp_growth": 4.7,
   "inflation": 2.1,
@@ -808,20 +809,21 @@ const TERMINAL_SCENARIOS = [
   },
   {
     label: "Taux de change",
-    code: `curl https://api.westafricaapi.com/v1/markets/fx \\
+    code: `curl https://api.westafricaapi.com/v1/economy/GH \\
   -H "Authorization: Bearer waa_live_sk_••••••••••••"`,
-    response: `{
-  "XOF_USD": 605.2,
-  "XOF_EUR": 655.96,
+    apiPath: "/v1/economy/GH",
+    fallback: `{
+  "country": "Ghana",
   "GHS_USD": 14.85,
-  "NGN_USD": 1542
+  "policy_rate": 27.0
 }`,
   },
   {
     label: "Population",
     code: `curl https://api.westafricaapi.com/v1/statistics/NG/population \\
   -H "Authorization: Bearer waa_live_sk_••••••••••••"`,
-    response: `{
+    apiPath: "/v1/statistics/NG/population",
+    fallback: `{
   "country": "Nigeria",
   "population": 223804632,
   "urban_rate": 54.3,
@@ -835,10 +837,33 @@ function TypewriterCode({ autoplay }: { autoplay: boolean }) {
   const [displayed, setDisplayed] = useState("");
   const [showResponse, setShowResponse] = useState(false);
   const [responseLine, setResponseLine] = useState(0);
+  const [liveResponses, setLiveResponses] = useState<Record<number, string>>({});
 
   const scenario = TERMINAL_SCENARIOS[scenarioIdx];
+  const responseText = liveResponses[scenarioIdx] || scenario.fallback;
 
-  // Reset + retype quand le scénario change ou autoplay s'active
+  useEffect(() => {
+    async function fetchAll() {
+      const results: Record<number, string> = {};
+      for (let idx = 0; idx < TERMINAL_SCENARIOS.length; idx++) {
+        try {
+          const res = await fetch(`${API_URL}${TERMINAL_SCENARIOS[idx].apiPath}`);
+          if (res.ok) {
+            const json = await res.json();
+            const compact: Record<string, unknown> = { country: json.country_name };
+            const ind = json.indicators || [];
+            for (const item of ind.slice(0, 4)) {
+              compact[item.metric_key] = item.value;
+            }
+            results[idx] = JSON.stringify(compact, null, 2);
+          }
+        } catch { /* use fallback */ }
+      }
+      setLiveResponses(results);
+    }
+    fetchAll();
+  }, []);
+
   useEffect(() => {
     if (!autoplay) return;
     setDisplayed("");
@@ -857,12 +882,10 @@ function TypewriterCode({ autoplay }: { autoplay: boolean }) {
     return () => clearInterval(iv);
   }, [autoplay, scenarioIdx, scenario.code]);
 
-  // Affiche la réponse ligne par ligne
   useEffect(() => {
     if (!showResponse) return;
-    const lines = scenario.response.split("\n");
+    const lines = responseText.split("\n");
     if (responseLine >= lines.length) {
-      // Pause puis passe au scénario suivant
       const t = setTimeout(() => {
         setScenarioIdx(s => (s + 1) % TERMINAL_SCENARIOS.length);
       }, 2200);
@@ -870,9 +893,9 @@ function TypewriterCode({ autoplay }: { autoplay: boolean }) {
     }
     const t = setTimeout(() => setResponseLine(r => r + 1), 80);
     return () => clearTimeout(t);
-  }, [showResponse, responseLine, scenario.response]);
+  }, [showResponse, responseLine, responseText]);
 
-  const responseLines = scenario.response.split("\n").slice(0, responseLine);
+  const responseLines = responseText.split("\n").slice(0, responseLine);
 
   return (
     <div className="rounded-xl overflow-hidden border border-white/10 bg-[#050810] shadow-2xl shadow-black/50 font-mono text-xs leading-relaxed">
@@ -1597,6 +1620,62 @@ const PRODUCT_STYLES: Record<ProductColor, { border: string; glow: string; icon:
 };
 
 function ProductsSection() {
+  const [liveSamples, setLiveSamples] = useState<Record<string, string>>({});
+
+  useEffect(() => {
+    async function fetchLiveSamples() {
+      const samples: Record<string, string> = {};
+      try {
+        const [econRes, popRes] = await Promise.allSettled([
+          fetch(`${API_URL}/v1/economy/SN`),
+          fetch(`${API_URL}/v1/statistics/NG/population`),
+        ]);
+
+        if (econRes.status === "fulfilled" && econRes.value.ok) {
+          const json = await econRes.value.json();
+          const ind = json.indicators || [];
+          const gdp = ind.find((i: { metric_key: string }) => i.metric_key?.includes("gdp_growth"));
+          const infl = ind.find((i: { metric_key: string }) => i.metric_key?.includes("inflation"));
+          const pop = ind.find((i: { metric_key: string }) => i.metric_key?.includes("population"));
+          const fx = ind.find((i: { metric_key: string }) => i.metric_key?.includes("fx_xof_usd"));
+          samples["Data API"] = JSON.stringify({
+            country: "Sénégal",
+            gdp_growth: gdp?.value ?? 4.7,
+            inflation: infl?.value ?? 2.1,
+            population: pop?.value ? +(pop.value / 1e6).toFixed(1) : 17.9,
+            currency: "XOF",
+          }, null, 2);
+          if (fx?.value) {
+            samples["Markets API"] = JSON.stringify({
+              XOF_USD: fx.value,
+              XOF_EUR: 655.96,
+              GHS_USD: 14.85,
+              NGN_USD: 1542,
+            }, null, 2);
+          }
+        }
+
+        if (popRes.status === "fulfilled" && popRes.value.ok) {
+          const json = await popRes.value.json();
+          const ind = json.indicators || [];
+          const total = ind.find((i: { metric_key: string }) => i.metric_key === "population_total");
+          const growth = ind.find((i: { metric_key: string }) => i.metric_key === "population_growth");
+          const urban = ind.find((i: { metric_key: string }) => i.metric_key?.includes("urban"));
+          if (total?.value) {
+            samples["_population"] = JSON.stringify({
+              country: "Nigeria",
+              population: Math.round(total.value),
+              urban_rate: urban?.value ?? 54.3,
+              growth_rate: growth?.value ?? 2.5,
+            }, null, 2);
+          }
+        }
+      } catch { /* fallback to static */ }
+      setLiveSamples(samples);
+    }
+    fetchLiveSamples();
+  }, []);
+
   return (
     <section className="py-24" style={{ background: "linear-gradient(180deg, #0c1120 0%, #080b1a 100%)" }}>
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -1611,11 +1690,12 @@ function ProductsSection() {
           </p>
         </div>
 
-        {/* Grid 3×2 */}
+        {/* Grid 3x2 */}
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
           {PRODUCTS.map((product) => {
             const s = PRODUCT_STYLES[product.color];
             const isLive = product.badge === "Live";
+            const sampleData = liveSamples[product.name] || product.sample.data;
             return (
               <div
                 key={product.name}
@@ -1654,7 +1734,7 @@ function ProductsSection() {
                     </div>
                     <pre
                       className="p-3 text-[11px] font-mono leading-relaxed overflow-hidden text-white/40"
-                      dangerouslySetInnerHTML={{ __html: highlightJson(product.sample.data) }}
+                      dangerouslySetInnerHTML={{ __html: highlightJson(sampleData) }}
                     />
                   </div>
                 </div>
