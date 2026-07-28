@@ -210,7 +210,7 @@ export default function CountryPage() {
         </ChartCard>
       )}
 
-      <DataTable columns={columns} data={filteredData as unknown as Record<string, unknown>[]} loading={isLoading} pageSize={15} />
+      <DataTable<DataRow> columns={columns} data={filteredData} loading={isLoading} pageSize={15} />
 
       <div className="bg-[#0a0e1f] rounded-xl border border-white/[0.08] p-5 space-y-3">
         <h3 className="text-sm font-medium text-white">Reference API</h3>
