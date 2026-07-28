@@ -1671,6 +1671,54 @@ function ProductsSection() {
             }, null, 2);
           }
         }
+
+        // Trade API
+        const tradeRes = await fetch(`${API_URL}/v1/trade/tariff?hs=8471&dest=SN`);
+        if (tradeRes.ok) {
+          const t = await tradeRes.json();
+          samples["Trade API"] = JSON.stringify({
+            hs_code: t.hs_code,
+            description: t.description,
+            tec_rate: t.tec_rate,
+            vat: t.vat,
+            total_duty: t.total_duty,
+          }, null, 2);
+        }
+
+        // Compliance API
+        const compRes = await fetch(`${API_URL}/v1/compliance/tax?country=CI`);
+        if (compRes.ok) {
+          const c = await compRes.json();
+          samples["Compliance API"] = JSON.stringify({
+            country: c.country,
+            vat_rate: c.vat_rate,
+            corporate_tax: c.corporate_tax,
+            withholding_tax: c.withholding_tax,
+          }, null, 2);
+        }
+
+        // Identity API
+        const idRes = await fetch(`${API_URL}/v1/identity/company/SN/NINEA/005678901`);
+        if (idRes.ok) {
+          const id = await idRes.json();
+          samples["Identity API"] = JSON.stringify({
+            registry: id.registry,
+            id_type: id.id_type,
+            id_value: id.id_value,
+            status: id.status,
+          }, null, 2);
+        }
+
+        // AI API
+        const aiRes = await fetch(`${API_URL}/v1/ai/status`);
+        if (aiRes.ok) {
+          const ai = await aiRes.json();
+          samples["AI API"] = JSON.stringify({
+            service: "WestAfrica AI",
+            status: ai.status || "operational",
+            capabilities: ["search", "qa", "compare", "translate"],
+          }, null, 2);
+        }
       } catch { /* fallback to static */ }
       setLiveSamples(samples);
     }
