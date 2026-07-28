@@ -2,7 +2,6 @@
 
 import { useEffect } from "react"
 import { Globe, Map, Percent, Route } from "lucide-react"
-import { useSidebar } from "@/hooks/use-sidebar"
 import { Breadcrumbs } from "@/components/shell/breadcrumbs"
 
 const SIDEBAR_ITEMS = [
@@ -26,14 +25,7 @@ const LEVIES = [
   { name: "Frais statistiques", rate: "1.0%", scope: "Tous les pays membres" },
 ]
 
-export default function TECPage() {
-  const { setItems, setTitle } = useSidebar()
-  useEffect(() => {
-    setTitle("COMMERCE")
-    setItems(SIDEBAR_ITEMS)
-  }, [setItems, setTitle])
-
-  return (
+export default function TECPage() {  return (
     <div className="space-y-6">
       <Breadcrumbs items={[{ label: "Commerce", href: "/trade" }, { label: "TEC CEDEAO" }]} />
 

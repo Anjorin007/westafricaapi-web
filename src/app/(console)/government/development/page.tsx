@@ -4,7 +4,6 @@ import { useEffect, useMemo } from "react"
 import { useQuery } from "@tanstack/react-query"
 import Image from "next/image"
 import { LayoutDashboard, Map, DollarSign, TrendingDown, Star } from "lucide-react"
-import { useSidebar } from "@/hooks/use-sidebar"
 import { Breadcrumbs } from "@/components/shell/breadcrumbs"
 import { DataTable, type Column } from "@/components/ui/data-table"
 import { API_URL } from "@/lib/api"
@@ -26,14 +25,7 @@ const COUNTRIES: Record<string, string> = {
 
 type HDIRow = Record<string, unknown> & { country_code: string; country: string; hdi: number | null; rank: number | null; gii: number | null; source: string }
 
-export default function DevelopmentPage() {
-  const { setItems, setTitle } = useSidebar()
-  useEffect(() => {
-    setTitle("FINANCES PUBLIQUES")
-    setItems(SIDEBAR_ITEMS)
-  }, [setItems, setTitle])
-
-  const { data: raw, isLoading } = useQuery({
+export default function DevelopmentPage() {  const { data: raw, isLoading } = useQuery({
     queryKey: ["government-development"],
     queryFn: () => fetch(`${API_URL}/v1/data?limit=500&latest=true`).then((r) => r.json()),
     staleTime: 5 * 60 * 1000,

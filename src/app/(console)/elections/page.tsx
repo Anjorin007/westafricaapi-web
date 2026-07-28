@@ -3,7 +3,6 @@
 import { useEffect, useMemo } from "react"
 import Image from "next/image"
 import { Calendar, Map } from "lucide-react"
-import { useSidebar } from "@/hooks/use-sidebar"
 import { Breadcrumbs } from "@/components/shell/breadcrumbs"
 import { StatCard } from "@/components/ui/stat-card"
 import { DataTable, type Column } from "@/components/ui/data-table"
@@ -48,14 +47,7 @@ const STATUS_LABELS: Record<string, { label: string; class: string }> = {
   held: { label: "Tenu", class: "bg-white/10 text-white/50 border-white/10" },
 }
 
-export default function ElectionsPage() {
-  const { setItems, setTitle } = useSidebar()
-  useEffect(() => {
-    setTitle("ELECTIONS")
-    setItems(SIDEBAR_ITEMS)
-  }, [setItems, setTitle])
-
-  const rows: ElectionRow[] = useMemo(() =>
+export default function ElectionsPage() {  const rows: ElectionRow[] = useMemo(() =>
     ELECTIONS.map((e) => ({ ...e, countdown: getCountdown(e.date) }))
   , [])
 

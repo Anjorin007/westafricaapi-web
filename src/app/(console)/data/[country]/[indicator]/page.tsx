@@ -5,7 +5,6 @@ import { useParams } from "next/navigation"
 import { useQuery } from "@tanstack/react-query"
 import { Globe, BarChart3, Ship, Users, Zap, Heart, Cpu, GitCompare, Download } from "lucide-react"
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts"
-import { useSidebar } from "@/hooks/use-sidebar"
 import { Breadcrumbs } from "@/components/shell/breadcrumbs"
 import { StatCard } from "@/components/ui/stat-card"
 import { DataTable, type Column } from "@/components/ui/data-table"
@@ -40,13 +39,6 @@ export default function IndicatorPage() {
   const countryCodeUpper = countryCode.toUpperCase()
   const indicator = decodeURIComponent(params.indicator as string)
   const countryName = COUNTRY_NAMES[countryCode] ?? countryCodeUpper
-
-  const { setItems, setTitle } = useSidebar()
-
-  useEffect(() => {
-    setTitle("DATA EXPLORER")
-    setItems(SIDEBAR_ITEMS)
-  }, [setItems, setTitle])
 
   const { data: historyData, isLoading } = useQuery({
     queryKey: ["indicator-history", countryCode, indicator],

@@ -3,7 +3,6 @@
 import { useEffect } from "react"
 import { useQuery } from "@tanstack/react-query"
 import { LayoutDashboard, DollarSign, TrendingUp, Landmark } from "lucide-react"
-import { useSidebar } from "@/hooks/use-sidebar"
 import { Breadcrumbs } from "@/components/shell/breadcrumbs"
 import { StatCard } from "@/components/ui/stat-card"
 import { DataTable, type Column } from "@/components/ui/data-table"
@@ -44,15 +43,7 @@ const FX_PAIRS: { key: string; pair: string; flag: string }[] = [
   { key: "cve_per_usd", pair: "CVE/USD", flag: "cv" },
 ]
 
-export default function MarketsPage() {
-  const { setItems, setTitle } = useSidebar()
-
-  useEffect(() => {
-    setTitle("MARCHES FINANCIERS")
-    setItems(SIDEBAR_ITEMS)
-  }, [setItems, setTitle])
-
-  const { data: snEconomy, isLoading: loadingSn } = useQuery({
+export default function MarketsPage() {  const { data: snEconomy, isLoading: loadingSn } = useQuery({
     queryKey: ["economy", "SN"],
     queryFn: () => fetch(`${API_URL}/v1/economy/SN`).then((r) => r.json()),
   })

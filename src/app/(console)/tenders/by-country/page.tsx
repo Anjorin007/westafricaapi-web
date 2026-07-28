@@ -3,7 +3,6 @@
 import { useEffect } from "react"
 import { FileText, MapPin, BarChart3 } from "lucide-react"
 import Link from "next/link"
-import { useSidebar } from "@/hooks/use-sidebar"
 import { Breadcrumbs } from "@/components/shell/breadcrumbs"
 
 const SIDEBAR_ITEMS = [
@@ -30,15 +29,7 @@ const COUNTRIES = [
   { code: "tg", name: "Togo" },
 ]
 
-export default function TendersByCountryPage() {
-  const { setItems, setTitle } = useSidebar()
-
-  useEffect(() => {
-    setTitle("MARCHES PUBLICS")
-    setItems(SIDEBAR_ITEMS)
-  }, [setItems, setTitle])
-
-  return (
+export default function TendersByCountryPage() {  return (
     <div className="space-y-8 p-6">
       <Breadcrumbs items={[{ label: "Marches publics", href: "/tenders" }, { label: "Par pays" }]} />
 

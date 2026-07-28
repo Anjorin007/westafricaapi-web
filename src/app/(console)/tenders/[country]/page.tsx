@@ -4,7 +4,6 @@ import { useEffect } from "react"
 import { useParams } from "next/navigation"
 import { useQuery } from "@tanstack/react-query"
 import { FileText, MapPin, BarChart3 } from "lucide-react"
-import { useSidebar } from "@/hooks/use-sidebar"
 import { Breadcrumbs } from "@/components/shell/breadcrumbs"
 import { StatCard } from "@/components/ui/stat-card"
 import { CopyButton } from "@/components/ui/copy-button"
@@ -29,13 +28,6 @@ export default function TenderCountryPage() {
   const country = String(params.country ?? "").toLowerCase()
   const countryCode = country.toUpperCase()
   const countryName = COUNTRIES[country] ?? country.toUpperCase()
-
-  const { setItems, setTitle } = useSidebar()
-
-  useEffect(() => {
-    setTitle("MARCHES PUBLICS")
-    setItems(SIDEBAR_ITEMS)
-  }, [setItems, setTitle])
 
   const { data: allData, isLoading } = useQuery({
     queryKey: ["data", "tenders", countryCode],

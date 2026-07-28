@@ -4,7 +4,6 @@ import { useEffect } from "react"
 import { useQuery } from "@tanstack/react-query"
 import { FileText, MapPin, BarChart3 } from "lucide-react"
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts"
-import { useSidebar } from "@/hooks/use-sidebar"
 import { Breadcrumbs } from "@/components/shell/breadcrumbs"
 import { StatCard } from "@/components/ui/stat-card"
 import { ChartCard } from "@/components/ui/chart-card"
@@ -32,15 +31,7 @@ type RankRow = {
   open: number
 }
 
-export default function TendersStatsPage() {
-  const { setItems, setTitle } = useSidebar()
-
-  useEffect(() => {
-    setTitle("MARCHES PUBLICS")
-    setItems(SIDEBAR_ITEMS)
-  }, [setItems, setTitle])
-
-  const { data: allData, isLoading } = useQuery({
+export default function TendersStatsPage() {  const { data: allData, isLoading } = useQuery({
     queryKey: ["data", "tenders-stats"],
     queryFn: () => fetch(`${API_URL}/v1/data?limit=500&latest=true`).then((r) => r.json()),
   })

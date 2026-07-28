@@ -6,7 +6,6 @@ import Link from "next/link"
 import Image from "next/image"
 import { motion } from "framer-motion"
 import { Globe, BarChart3, Ship, Users, Zap, Heart, Cpu, GitCompare, Download, Search } from "lucide-react"
-import { useSidebar } from "@/hooks/use-sidebar"
 import { Breadcrumbs } from "@/components/shell/breadcrumbs"
 import { StatCard } from "@/components/ui/stat-card"
 import { API_URL } from "@/lib/api"
@@ -53,15 +52,8 @@ const COUNTRIES = [
 ]
 
 export default function DataExplorerPage() {
-  const { setItems, setTitle } = useSidebar()
   const [search, setSearch] = useState("")
   const [category, setCategory] = useState("all")
-
-  useEffect(() => {
-    setTitle("DATA EXPLORER")
-    setItems(SIDEBAR_ITEMS)
-  }, [setItems, setTitle])
-
   const { data: overview, isLoading } = useQuery({
     queryKey: ["data-overview"],
     queryFn: () => fetch(`${API_URL}/v1/data?limit=500&latest=true`).then((r) => r.json()),

@@ -3,7 +3,6 @@
 import { useEffect } from "react"
 import { useQuery } from "@tanstack/react-query"
 import { LayoutDashboard, DollarSign, TrendingUp, Landmark } from "lucide-react"
-import { useSidebar } from "@/hooks/use-sidebar"
 import { Breadcrumbs } from "@/components/shell/breadcrumbs"
 import { StatCard } from "@/components/ui/stat-card"
 import { DataTable, type Column } from "@/components/ui/data-table"
@@ -33,15 +32,7 @@ const BRVM_METRICS = [
   { key: "brvm_listed_companies_count", label: "Societes cotees" },
 ]
 
-export default function BrvmPage() {
-  const { setItems, setTitle } = useSidebar()
-
-  useEffect(() => {
-    setTitle("MARCHES FINANCIERS")
-    setItems(SIDEBAR_ITEMS)
-  }, [setItems, setTitle])
-
-  const { data: allData, isLoading } = useQuery({
+export default function BrvmPage() {  const { data: allData, isLoading } = useQuery({
     queryKey: ["data", "brvm-latest"],
     queryFn: () => fetch(`${API_URL}/v1/data?limit=200&latest=true`).then((r) => r.json()),
   })

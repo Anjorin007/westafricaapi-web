@@ -5,7 +5,6 @@ import { useQuery } from "@tanstack/react-query"
 import Link from "next/link"
 import Image from "next/image"
 import { LayoutDashboard, Map, DollarSign, TrendingDown, Star } from "lucide-react"
-import { useSidebar } from "@/hooks/use-sidebar"
 import { Breadcrumbs } from "@/components/shell/breadcrumbs"
 import { StatCard } from "@/components/ui/stat-card"
 import { DataTable, type Column } from "@/components/ui/data-table"
@@ -35,14 +34,7 @@ type GovRow = Record<string, unknown> & {
   hdi: number | null
 }
 
-export default function GovernmentPage() {
-  const { setItems, setTitle } = useSidebar()
-  useEffect(() => {
-    setTitle("FINANCES PUBLIQUES")
-    setItems(SIDEBAR_ITEMS)
-  }, [setItems, setTitle])
-
-  const { data: raw, isLoading } = useQuery({
+export default function GovernmentPage() {  const { data: raw, isLoading } = useQuery({
     queryKey: ["government-overview"],
     queryFn: () => fetch(`${API_URL}/v1/data?limit=500&latest=true`).then((r) => r.json()),
     staleTime: 5 * 60 * 1000,

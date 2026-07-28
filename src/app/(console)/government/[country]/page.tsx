@@ -6,7 +6,6 @@ import { useQuery } from "@tanstack/react-query"
 import Image from "next/image"
 import { LayoutDashboard, Map, DollarSign, TrendingDown, Star } from "lucide-react"
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend } from "recharts"
-import { useSidebar } from "@/hooks/use-sidebar"
 import { Breadcrumbs } from "@/components/shell/breadcrumbs"
 import { StatCard } from "@/components/ui/stat-card"
 import { ChartCard } from "@/components/ui/chart-card"
@@ -35,12 +34,6 @@ export default function GovernmentCountryPage() {
   const params = useParams<{ country: string }>()
   const code = params.country.toLowerCase()
   const countryName = COUNTRIES[code] ?? code.toUpperCase()
-
-  const { setItems, setTitle } = useSidebar()
-  useEffect(() => {
-    setTitle("FINANCES PUBLIQUES")
-    setItems(SIDEBAR_ITEMS)
-  }, [setItems, setTitle])
 
   const { data: raw, isLoading } = useQuery({
     queryKey: ["government-country", code],

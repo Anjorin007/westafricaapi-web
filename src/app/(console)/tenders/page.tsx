@@ -4,7 +4,6 @@ import { useEffect } from "react"
 import { useQuery } from "@tanstack/react-query"
 import { FileText, MapPin, BarChart3 } from "lucide-react"
 import Link from "next/link"
-import { useSidebar } from "@/hooks/use-sidebar"
 import { Breadcrumbs } from "@/components/shell/breadcrumbs"
 import { StatCard } from "@/components/ui/stat-card"
 import { DataTable, type Column } from "@/components/ui/data-table"
@@ -46,15 +45,7 @@ type TenderRow = {
   volume: string
 }
 
-export default function TendersPage() {
-  const { setItems, setTitle } = useSidebar()
-
-  useEffect(() => {
-    setTitle("MARCHES PUBLICS")
-    setItems(SIDEBAR_ITEMS)
-  }, [setItems, setTitle])
-
-  const { data: allData, isLoading } = useQuery({
+export default function TendersPage() {  const { data: allData, isLoading } = useQuery({
     queryKey: ["data", "tenders-latest"],
     queryFn: () => fetch(`${API_URL}/v1/data?limit=500&latest=true`).then((r) => r.json()),
   })

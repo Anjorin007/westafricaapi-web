@@ -4,7 +4,6 @@ import { useEffect, useMemo } from "react"
 import { useQuery } from "@tanstack/react-query"
 import Image from "next/image"
 import { LayoutDashboard, Map, DollarSign, TrendingDown, Star } from "lucide-react"
-import { useSidebar } from "@/hooks/use-sidebar"
 import { Breadcrumbs } from "@/components/shell/breadcrumbs"
 import { API_URL } from "@/lib/api"
 
@@ -25,14 +24,7 @@ const COUNTRIES: Record<string, string> = {
 
 type DebtRow = { country_code: string; country: string; debt_pct: number; source: string }
 
-export default function DebtPage() {
-  const { setItems, setTitle } = useSidebar()
-  useEffect(() => {
-    setTitle("FINANCES PUBLIQUES")
-    setItems(SIDEBAR_ITEMS)
-  }, [setItems, setTitle])
-
-  const { data: raw, isLoading } = useQuery({
+export default function DebtPage() {  const { data: raw, isLoading } = useQuery({
     queryKey: ["government-debt"],
     queryFn: () => fetch(`${API_URL}/v1/data?limit=500&latest=true`).then((r) => r.json()),
     staleTime: 5 * 60 * 1000,

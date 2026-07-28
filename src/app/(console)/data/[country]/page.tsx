@@ -8,7 +8,6 @@ import Image from "next/image"
 import Link from "next/link"
 import { Globe, BarChart3, Ship, Users, Zap, Heart, Cpu, GitCompare, Download } from "lucide-react"
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts"
-import { useSidebar } from "@/hooks/use-sidebar"
 import { Breadcrumbs } from "@/components/shell/breadcrumbs"
 import { StatCard } from "@/components/ui/stat-card"
 import { DataTable, type Column } from "@/components/ui/data-table"
@@ -79,13 +78,7 @@ export default function CountryPage() {
   const countryCodeUpper = countryCode.toUpperCase()
   const meta = COUNTRY_META[countryCode]
 
-  const { setItems, setTitle } = useSidebar()
   const [tab, setTab] = useQueryState("tab", { defaultValue: "economy" })
-
-  useEffect(() => {
-    setTitle("DATA EXPLORER")
-    setItems(SIDEBAR_ITEMS)
-  }, [setItems, setTitle])
 
   const { data: allData, isLoading } = useQuery({
     queryKey: ["country-data", countryCode],
