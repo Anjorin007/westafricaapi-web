@@ -1529,7 +1529,7 @@ const PRODUCTS: Product[] = [
   },
   {
     name: "Trade API",
-    badge: "Beta",
+    badge: "Live",
     description: "Codes SH, droits douane TEC-CEDEAO, corridors régionaux",
     Icon: Ship,
     color: "indigo",
@@ -1562,7 +1562,7 @@ const PRODUCTS: Product[] = [
   },
   {
     name: "Compliance API",
-    badge: "Q4 2026",
+    badge: "Live",
     description: "Fiscalité, réglementations douanières, procédures import/export",
     Icon: Scale,
     color: "amber",
@@ -1578,7 +1578,7 @@ const PRODUCTS: Product[] = [
   },
   {
     name: "Identity API",
-    badge: "Q1 2027",
+    badge: "Live",
     description: "Vérification RCCM, NINEA, IFU. Registres entreprises officiels.",
     Icon: Fingerprint,
     color: "rose",
@@ -1594,7 +1594,7 @@ const PRODUCTS: Product[] = [
   },
   {
     name: "AI API",
-    badge: "2027",
+    badge: "Live",
     description: "Q&R sur docs officiels, résumés PDF, recherche sémantique RAG",
     Icon: Sparkles,
     color: "sky",
