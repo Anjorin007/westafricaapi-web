@@ -1389,23 +1389,28 @@ function CoverageSection() {
   useEffect(() => {
     async function load() {
       const map: Record<string, CountryStats> = {};
-      const safeFetch = async (url: string) => {
-        try {
-          const res = await fetch(url);
-          if (res.ok) return await res.json();
-        } catch { /* silent */ }
+      const safeFetch = async (url: string): Promise<Record<string, unknown> | null> => {
+        for (let attempt = 0; attempt < 2; attempt++) {
+          try {
+            const controller = new AbortController();
+            const timeout = setTimeout(() => controller.abort(), 30000);
+            const res = await fetch(url, { signal: controller.signal });
+            clearTimeout(timeout);
+            if (res.ok) return await res.json();
+          } catch { /* retry */ }
+          if (attempt === 0) await new Promise(r => setTimeout(r, 3000));
+        }
         return null;
       };
 
-      // Séquentiel pour éviter les timeout cold-start
       const j1 = await safeFetch(`${API_URL}/v1/data?indicator=gdp_growth_annual&latest=true`);
-      if (j1) for (const d of j1.data || []) { if (!map[d.country_code]) map[d.country_code] = {}; map[d.country_code].gdp_growth = d.value; }
+      if (j1) for (const d of (j1.data as Array<{country_code: string; value: number}>) || []) { if (!map[d.country_code]) map[d.country_code] = {}; map[d.country_code].gdp_growth = d.value; }
 
       const j2 = await safeFetch(`${API_URL}/v1/data?indicator=population_total&latest=true`);
-      if (j2) for (const d of j2.data || []) { if (!map[d.country_code]) map[d.country_code] = {}; map[d.country_code].population = d.value; }
+      if (j2) for (const d of (j2.data as Array<{country_code: string; value: number}>) || []) { if (!map[d.country_code]) map[d.country_code] = {}; map[d.country_code].population = d.value; }
 
       const j3 = await safeFetch(`${API_URL}/v1/data?indicator=inflation_consumer_prices&latest=true`);
-      if (j3) for (const d of j3.data || []) { if (!map[d.country_code]) map[d.country_code] = {}; map[d.country_code].inflation = d.value; }
+      if (j3) for (const d of (j3.data as Array<{country_code: string; value: number}>) || []) { if (!map[d.country_code]) map[d.country_code] = {}; map[d.country_code].inflation = d.value; }
 
       setAllStats(map);
       setLoaded(true);
@@ -1995,22 +2000,28 @@ export default function HomePage() {
   useEffect(() => {
     async function fetchCountryData() {
       const map: Record<string, CountryData> = {};
-      const safeFetch = async (url: string) => {
-        try {
-          const res = await fetch(url);
-          if (res.ok) return await res.json();
-        } catch { /* silent */ }
+      const safeFetch = async (url: string): Promise<Record<string, unknown> | null> => {
+        for (let attempt = 0; attempt < 2; attempt++) {
+          try {
+            const controller = new AbortController();
+            const timeout = setTimeout(() => controller.abort(), 30000);
+            const res = await fetch(url, { signal: controller.signal });
+            clearTimeout(timeout);
+            if (res.ok) return await res.json();
+          } catch { /* retry */ }
+          if (attempt === 0) await new Promise(r => setTimeout(r, 3000));
+        }
         return null;
       };
 
       const j1 = await safeFetch(`${API_URL}/v1/data?indicator=gdp_growth_annual&latest=true`);
-      if (j1) for (const d of j1.data || []) { if (!map[d.country_code]) map[d.country_code] = {}; map[d.country_code].gdp_growth = d.value; }
+      if (j1) for (const d of (j1.data as Array<{country_code: string; value: number}>) || []) { if (!map[d.country_code]) map[d.country_code] = {}; map[d.country_code].gdp_growth = d.value; }
 
       const j2 = await safeFetch(`${API_URL}/v1/data?indicator=population_total&latest=true`);
-      if (j2) for (const d of j2.data || []) { if (!map[d.country_code]) map[d.country_code] = {}; map[d.country_code].population = d.value; }
+      if (j2) for (const d of (j2.data as Array<{country_code: string; value: number}>) || []) { if (!map[d.country_code]) map[d.country_code] = {}; map[d.country_code].population = d.value; }
 
       const j3 = await safeFetch(`${API_URL}/v1/data?indicator=inflation_consumer_prices&latest=true`);
-      if (j3) for (const d of j3.data || []) { if (!map[d.country_code]) map[d.country_code] = {}; map[d.country_code].inflation = d.value; }
+      if (j3) for (const d of (j3.data as Array<{country_code: string; value: number}>) || []) { if (!map[d.country_code]) map[d.country_code] = {}; map[d.country_code].inflation = d.value; }
 
       setCountryData(map);
     }
