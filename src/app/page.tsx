@@ -1634,25 +1634,26 @@ function ProductsSection() {
         if (econRes.status === "fulfilled" && econRes.value.ok) {
           const json = await econRes.value.json();
           const ind = json.indicators || [];
-          const gdp = ind.find((i: { metric_key: string }) => i.metric_key?.includes("gdp_growth"));
-          const infl = ind.find((i: { metric_key: string }) => i.metric_key?.includes("inflation"));
-          const pop = ind.find((i: { metric_key: string }) => i.metric_key?.includes("population"));
-          const fx = ind.find((i: { metric_key: string }) => i.metric_key?.includes("fx_xof_usd"));
+          const find = (partial: string) => ind.find((i: { metric_key: string }) => i.metric_key?.includes(partial));
+          const gdp = find("gdp_growth");
+          const infl = find("inflation_consumer") || find("inflation");
+          const pop = find("population_total") || find("population");
+          const fxUsd = find("fx_xof_usd") || find("bceao_fx");
+          const fxEur = find("fx_xof_eur");
+          const gdpPc = find("gdp_per_capita");
           samples["Data API"] = JSON.stringify({
             country: "Sénégal",
-            gdp_growth: gdp?.value ?? 4.7,
-            inflation: infl?.value ?? 2.1,
-            population: pop?.value ? +(pop.value / 1e6).toFixed(1) : 17.9,
+            gdp_growth: gdp?.value != null ? +gdp.value.toFixed(2) : 4.7,
+            inflation: infl?.value != null ? +infl.value.toFixed(1) : 2.1,
+            gdp_per_capita: gdpPc?.value != null ? +gdpPc.value.toFixed(0) : 1720,
             currency: "XOF",
           }, null, 2);
-          if (fx?.value) {
-            samples["Markets API"] = JSON.stringify({
-              XOF_USD: fx.value,
-              XOF_EUR: 655.96,
-              GHS_USD: 14.85,
-              NGN_USD: 1542,
-            }, null, 2);
-          }
+          samples["Markets API"] = JSON.stringify({
+            XOF_USD: fxUsd?.value ?? 605.2,
+            XOF_EUR: fxEur?.value ?? 655.96,
+            source: "BCEAO",
+            updated: json.indicators?.[0]?.retrieved_at?.slice(0, 10) ?? "2026-07-27",
+          }, null, 2);
         }
 
         if (popRes.status === "fulfilled" && popRes.value.ok) {
