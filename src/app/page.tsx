@@ -1403,14 +1403,14 @@ function CoverageSection() {
         return null;
       };
 
-      const j1 = await safeFetch(`${API_URL}/v1/data?indicator=gdp_growth_annual&latest=true`);
-      if (j1) for (const d of (j1.data as Array<{country_code: string; value: number}>) || []) { if (!map[d.country_code]) map[d.country_code] = {}; map[d.country_code].gdp_growth = d.value; }
+      const j1 = await safeFetch(`${API_URL}/v1/data?indicator=gdp_growth_annual&limit=50`);
+      if (j1) for (const d of (j1.data as Array<{country_code: string; value: number}>) || []) { if (!map[d.country_code]) map[d.country_code] = {}; if (map[d.country_code].gdp_growth == null) map[d.country_code].gdp_growth = d.value; }
 
-      const j2 = await safeFetch(`${API_URL}/v1/data?indicator=population_total&latest=true`);
-      if (j2) for (const d of (j2.data as Array<{country_code: string; value: number}>) || []) { if (!map[d.country_code]) map[d.country_code] = {}; map[d.country_code].population = d.value; }
+      const j2 = await safeFetch(`${API_URL}/v1/data?indicator=population_total&limit=50`);
+      if (j2) for (const d of (j2.data as Array<{country_code: string; value: number}>) || []) { if (!map[d.country_code]) map[d.country_code] = {}; if (map[d.country_code].population == null) map[d.country_code].population = d.value; }
 
-      const j3 = await safeFetch(`${API_URL}/v1/data?indicator=inflation_consumer_prices&latest=true`);
-      if (j3) for (const d of (j3.data as Array<{country_code: string; value: number}>) || []) { if (!map[d.country_code]) map[d.country_code] = {}; map[d.country_code].inflation = d.value; }
+      const j3 = await safeFetch(`${API_URL}/v1/data?indicator=inflation_consumer_prices&limit=50`);
+      if (j3) for (const d of (j3.data as Array<{country_code: string; value: number}>) || []) { if (!map[d.country_code]) map[d.country_code] = {}; if (map[d.country_code].inflation == null) map[d.country_code].inflation = d.value; }
 
       setAllStats(map);
       setLoaded(true);
@@ -2014,14 +2014,14 @@ export default function HomePage() {
         return null;
       };
 
-      const j1 = await safeFetch(`${API_URL}/v1/data?indicator=gdp_growth_annual&latest=true`);
-      if (j1) for (const d of (j1.data as Array<{country_code: string; value: number}>) || []) { if (!map[d.country_code]) map[d.country_code] = {}; map[d.country_code].gdp_growth = d.value; }
+      const j1 = await safeFetch(`${API_URL}/v1/data?indicator=gdp_growth_annual&limit=50`);
+      if (j1) for (const d of (j1.data as Array<{country_code: string; value: number}>) || []) { if (!map[d.country_code]) map[d.country_code] = {}; if (map[d.country_code].gdp_growth == null) map[d.country_code].gdp_growth = d.value; }
 
-      const j2 = await safeFetch(`${API_URL}/v1/data?indicator=population_total&latest=true`);
-      if (j2) for (const d of (j2.data as Array<{country_code: string; value: number}>) || []) { if (!map[d.country_code]) map[d.country_code] = {}; map[d.country_code].population = d.value; }
+      const j2 = await safeFetch(`${API_URL}/v1/data?indicator=population_total&limit=50`);
+      if (j2) for (const d of (j2.data as Array<{country_code: string; value: number}>) || []) { if (!map[d.country_code]) map[d.country_code] = {}; if (map[d.country_code].population == null) map[d.country_code].population = d.value; }
 
-      const j3 = await safeFetch(`${API_URL}/v1/data?indicator=inflation_consumer_prices&latest=true`);
-      if (j3) for (const d of (j3.data as Array<{country_code: string; value: number}>) || []) { if (!map[d.country_code]) map[d.country_code] = {}; map[d.country_code].inflation = d.value; }
+      const j3 = await safeFetch(`${API_URL}/v1/data?indicator=inflation_consumer_prices&limit=50`);
+      if (j3) for (const d of (j3.data as Array<{country_code: string; value: number}>) || []) { if (!map[d.country_code]) map[d.country_code] = {}; if (map[d.country_code].inflation == null) map[d.country_code].inflation = d.value; }
 
       setCountryData(map);
     }
