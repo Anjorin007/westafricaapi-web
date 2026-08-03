@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useState, useEffect, useRef, useCallback } from "react";
-import { ArrowRight, BarChart3, Ship, TrendingUp, Scale, Fingerprint, Sparkles } from "lucide-react";
+import { ArrowRight, BarChart3, Ship, TrendingUp, Scale, Sparkles } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { buttonVariants } from "@/components/ui/button";
@@ -1508,16 +1508,20 @@ type ProductColor = "teal" | "indigo" | "violet" | "amber" | "rose" | "sky";
 interface Product {
   name: string;
   badge: string;
+  href: string;
   description: string;
   Icon: React.ComponentType<{ className?: string }>;
   color: ProductColor;
   sample: { endpoint: string; data: string };
 }
 
+// Data / Trade / Markets / AI = vitrine freemium (badge "Free")
+// Compliance = produit phare Enterprise, fusionne Compliance + Identity API
 const PRODUCTS: Product[] = [
   {
     name: "Data API",
-    badge: "Live",
+    badge: "Free",
+    href: "/data",
     description: "PIB, inflation, population, énergie. 23 indicateurs, 15 pays.",
     Icon: BarChart3,
     color: "teal",
@@ -1534,7 +1538,8 @@ const PRODUCTS: Product[] = [
   },
   {
     name: "Trade API",
-    badge: "Live",
+    badge: "Free",
+    href: "/trade",
     description: "Codes SH, droits douane TEC-CEDEAO, corridors régionaux",
     Icon: Ship,
     color: "indigo",
@@ -1551,7 +1556,8 @@ const PRODUCTS: Product[] = [
   },
   {
     name: "Markets API",
-    badge: "Live",
+    badge: "Free",
+    href: "/markets",
     description: "Taux de change XOF/USD/EUR, BCEAO, prix matières premières",
     Icon: TrendingUp,
     color: "violet",
@@ -1566,11 +1572,12 @@ const PRODUCTS: Product[] = [
     },
   },
   {
-    name: "Compliance API",
-    badge: "Live",
-    description: "Fiscalité, réglementations douanières, procédures import/export",
+    name: "Compliance Suite",
+    badge: "Enterprise",
+    href: "/compliance",
+    description: "Vérification RCCM/NINEA/IFU + fiscalité par pays. KYC/AML CEDEAO.",
     Icon: Scale,
-    color: "amber",
+    color: "rose",
     sample: {
       endpoint: "GET /v1/compliance/tax?country=CI",
       data: `{
@@ -1582,24 +1589,9 @@ const PRODUCTS: Product[] = [
     },
   },
   {
-    name: "Identity API",
-    badge: "Live",
-    description: "Vérification RCCM, NINEA, IFU. Registres entreprises officiels.",
-    Icon: Fingerprint,
-    color: "rose",
-    sample: {
-      endpoint: "GET /v1/identity/company/SN/NINEA/005678901",
-      data: `{
-  "name": "Dakar Tech SARL",
-  "ninea": "005678901",
-  "status": "active",
-  "registered": "2021-03-12"
-}`,
-    },
-  },
-  {
     name: "AI API",
-    badge: "Live",
+    badge: "Free",
+    href: "/ai",
     description: "Q&R sur docs officiels, résumés PDF, recherche sémantique RAG",
     Icon: Sparkles,
     color: "sky",
@@ -1689,27 +1681,15 @@ function ProductsSection() {
           }, null, 2);
         }
 
-        // Compliance API
+        // Compliance Suite (Compliance + Identity fusionnés)
         const compRes = await fetch(`${API_URL}/v1/compliance/tax?country=CI`);
         if (compRes.ok) {
           const c = await compRes.json();
-          samples["Compliance API"] = JSON.stringify({
+          samples["Compliance Suite"] = JSON.stringify({
             country: c.country,
             vat_rate: c.vat_rate,
             corporate_tax: c.corporate_tax,
             withholding_tax: c.withholding_tax,
-          }, null, 2);
-        }
-
-        // Identity API
-        const idRes = await fetch(`${API_URL}/v1/identity/company/SN/NINEA/005678901`);
-        if (idRes.ok) {
-          const id = await idRes.json();
-          samples["Identity API"] = JSON.stringify({
-            registry: id.registry,
-            id_type: id.id_type,
-            id_value: id.id_value,
-            status: id.status,
           }, null, 2);
         }
 
@@ -1747,12 +1727,16 @@ function ProductsSection() {
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
           {PRODUCTS.map((product) => {
             const s = PRODUCT_STYLES[product.color];
-            const isLive = product.badge === "Live";
+            const isFree = product.badge === "Free";
+            const isEnterprise = product.badge === "Enterprise";
             const sampleData = liveSamples[product.name] || product.sample.data;
             return (
-              <div
+              <Link
                 key={product.name}
-                className={`group relative rounded-2xl border bg-[#0a0f1e] p-6 transition-all duration-300 cursor-default ${s.border}`}
+                href={product.href}
+                className={`group relative rounded-2xl border bg-[#0a0f1e] p-6 transition-all duration-300 ${s.border} ${
+                  isEnterprise ? "shadow-[0_0_40px_-15px_rgba(244,63,94,0.35)]" : ""
+                }`}
               >
                 {/* Hover glow */}
                 <div className={`absolute inset-0 rounded-2xl transition-all duration-300 ${s.glow}`} />
@@ -1764,7 +1748,7 @@ function ProductsSection() {
                       <product.Icon className="w-5 h-5" />
                     </div>
                     <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-medium border ${s.badge}`}>
-                      {isLive && <span className={`w-1.5 h-1.5 rounded-full animate-pulse ${s.dot}`} />}
+                      {isFree && <span className={`w-1.5 h-1.5 rounded-full animate-pulse ${s.dot}`} />}
                       {product.badge}
                     </span>
                   </div>
@@ -1790,8 +1774,15 @@ function ProductsSection() {
                       dangerouslySetInnerHTML={{ __html: highlightJson(sampleData) }}
                     />
                   </div>
+
+                  {isEnterprise && (
+                    <p className="flex items-center gap-1.5 text-xs font-medium text-rose-300 pt-1">
+                      Demander une démo
+                      <ArrowRight className="w-3.5 h-3.5 transition-transform duration-200 group-hover:translate-x-0.5" />
+                    </p>
+                  )}
                 </div>
-              </div>
+              </Link>
             );
           })}
         </div>

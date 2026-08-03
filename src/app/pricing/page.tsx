@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { motion, AnimatePresence, type Variants } from "framer-motion";
 import { cn } from "@/lib/utils";
-import { Check, ArrowRight } from "lucide-react";
+import { Check, ArrowRight, Shield } from "lucide-react";
 import { Navbar } from "@/components/navbar";
 import { Footer } from "@/components/footer";
 
@@ -20,7 +20,7 @@ const plans = [
       "1 000 requêtes/mois",
       "5 requêtes/minute",
       "1 clé API",
-      "Tous les endpoints (Data, Tenders, Markets, Government)",
+      "Data, Markets, Trade, Tenders API",
       "15 pays Afrique de l'Ouest",
       "Support communautaire",
     ],
@@ -36,7 +36,7 @@ const plans = [
       "150 000 requêtes/mois",
       "60 requêtes/minute",
       "3 clés API",
-      "Tous les endpoints",
+      "Data, Markets, Trade, Tenders API",
       "Webhooks basiques",
       "Export CSV/JSON",
       "Support email",
@@ -54,7 +54,7 @@ const plans = [
       "500 000 requêtes/mois",
       "300 requêtes/minute",
       "5 clés API",
-      "Tous les endpoints",
+      "Data, Markets, Trade, Tenders API",
       "Webhooks avancés avec retry et filtres",
       "Alertes personnalisées",
       "Export CSV/JSON",
@@ -74,6 +74,7 @@ const plans = [
       "Clés API illimitées",
       "SLA garanti",
       "Dump données brutes",
+      "Accès Compliance Suite inclus",
       "Account manager dédié",
       "Contrat personnalisé",
     ],
@@ -91,7 +92,7 @@ const faqs = [
   },
   {
     q: "Les données sont-elles les mêmes sur tous les plans ?",
-    a: "Oui. Tous les plans donnent accès aux mêmes endpoints, aux mêmes pays et aux mêmes données. Les plans payants achètent du volume et du débit, pas de l'accès supplémentaire.",
+    a: "Pour Data, Markets, Trade et Tenders : oui, tous les plans donnent accès aux mêmes endpoints et aux mêmes pays. Les plans payants achètent du volume et du débit, pas de l'accès supplémentaire. La Compliance Suite (vérification RCCM/NINEA, fiscalité) est un produit séparé, vendu sur devis aux entreprises.",
   },
   {
     q: "Puis-je changer de plan à tout moment ?",
@@ -145,8 +146,9 @@ export default function PricingPage() {
             transition={{ duration: 0.4, delay: 0.1 }}
             className="mt-4 text-base text-white/50 max-w-2xl mx-auto leading-relaxed"
           >
-            Commencez gratuitement. Tous les plans donnent accès aux mêmes données — 15 pays, tous les endpoints.
+            Commencez gratuitement sur Data, Markets, Trade et Tenders — 15 pays, mêmes endpoints sur tous les plans.
             Les plans payants achètent du volume et du débit, pas de l'accès supplémentaire. Aucune carte requise à l'inscription.
+            La Compliance Suite (KYC/AML) est un produit séparé, vendu sur devis.
           </motion.p>
 
           {/* Toggle */}
@@ -177,6 +179,41 @@ export default function PricingPage() {
                 -20%
               </span>
             </button>
+          </motion.div>
+        </section>
+
+        {/* Compliance Suite — produit phare Enterprise */}
+        <section className="max-w-5xl mx-auto px-6 pb-20">
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="rounded-2xl border border-rose-500/25 bg-[#0d1028] p-8 sm:p-10 shadow-[0_0_50px_-15px_rgba(244,63,94,0.25)] flex flex-col md:flex-row items-start md:items-center gap-6 justify-between"
+          >
+            <div className="flex items-start gap-4">
+              <div className="p-3 rounded-xl bg-rose-500/10 shrink-0">
+                <Shield className="w-6 h-6 text-rose-400" />
+              </div>
+              <div>
+                <div className="flex items-center gap-2">
+                  <h2 className="text-xl font-bold text-white">Compliance Suite</h2>
+                  <span className="text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full bg-rose-500/15 text-rose-300 border border-rose-500/25">
+                    Enterprise
+                  </span>
+                </div>
+                <p className="mt-2 text-white/50 text-sm max-w-md leading-relaxed">
+                  Vérification RCCM/NINEA/IFU et fiscalité par pays pour votre conformité KYC/AML.
+                  Pour banques, fintechs et mobile money opérant en Afrique de l&apos;Ouest.
+                </p>
+              </div>
+            </div>
+            <Link
+              href="/compliance"
+              className="shrink-0 inline-flex items-center gap-2 bg-rose-400 hover:bg-rose-300 text-black font-semibold px-6 py-3 rounded-xl text-sm transition-colors whitespace-nowrap"
+            >
+              Demander une démo
+              <ArrowRight className="w-4 h-4" />
+            </Link>
           </motion.div>
         </section>
 

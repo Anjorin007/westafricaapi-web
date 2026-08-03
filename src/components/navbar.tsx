@@ -3,17 +3,15 @@
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
-import { Menu, X, ChevronDown, BarChart3, TrendingUp, Ship, Scale, Fingerprint, Sparkles, Gavel, Landmark, Vote } from "lucide-react";
+import { Menu, X, ChevronDown, Sparkles, Landmark, Vote, Shield } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { Logo } from "@/components/logo";
 
 // Dans "Plus" : uniquement ce qui N'est PAS déjà en lien direct
-// Produits API non exposés en direct
+// Produits API non exposés en direct (Compliance/Identity ont leur propre lien "Enterprise")
 const API_PRODUCTS = [
-  { href: "/compliance", label: "Compliance API",  desc: "Fiscalité, réglementations douanières", icon: Scale,       color: "amber" },
-  { href: "/identity",   label: "Identity API",    desc: "RCCM, NINEA, IFU, registres",           icon: Fingerprint, color: "rose" },
-  { href: "/ai",         label: "AI API",          desc: "Q&R, résumés PDF, recherche RAG",       icon: Sparkles,    color: "sky" },
+  { href: "/ai", label: "AI API", desc: "Q&R, résumés PDF, recherche RAG", icon: Sparkles, color: "sky" },
 ];
 
 // Pages de contenu non exposées en direct
@@ -31,7 +29,7 @@ const ICON_COLORS: Record<string, string> = {
   sky:    "bg-sky-500/10 text-sky-400",
 };
 
-// Liens directs dans le nav
+// Liens directs dans le nav — la vitrine gratuite / freemium
 const DIRECT_LINKS = [
   { href: "/data",     label: "Data" },
   { href: "/markets",  label: "Markets" },
@@ -72,7 +70,7 @@ export function Navbar() {
           {/* Desktop nav — centre */}
           <nav className="hidden lg:flex items-center gap-0.5 flex-1">
 
-            {/* Liens directs */}
+            {/* Liens directs — freemium */}
             {DIRECT_LINKS.map((link) => (
               <Link
                 key={link.href}
@@ -87,6 +85,26 @@ export function Navbar() {
                 {link.label}
               </Link>
             ))}
+
+            {/* Séparateur avant le produit phare */}
+            <div className="w-px h-4 bg-white/10 mx-1" />
+
+            {/* Compliance — produit phare Enterprise, mis en avant */}
+            <Link
+              href="/compliance"
+              className={cn(
+                "flex items-center gap-1.5 px-3 py-2 text-sm font-medium rounded-lg transition-all duration-150 border",
+                isActive("/compliance")
+                  ? "text-white bg-rose-500/15 border-rose-500/30"
+                  : "text-rose-300 border-rose-500/20 hover:bg-rose-500/10 hover:border-rose-500/30"
+              )}
+            >
+              <Shield className="h-3.5 w-3.5" />
+              Compliance
+              <span className="text-[9px] font-semibold uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-rose-500/20 text-rose-300">
+                Enterprise
+              </span>
+            </Link>
 
             {/* Plus dropdown */}
             <div
@@ -217,6 +235,19 @@ export function Navbar() {
                   {link.label}
                 </Link>
               ))}
+
+              <div className="h-px bg-white/8 my-2" />
+
+              {/* Compliance mis en avant */}
+              <Link href="/compliance"
+                className="flex items-center gap-2 px-3 py-2.5 text-sm font-medium text-rose-300 bg-rose-500/10 border border-rose-500/20 rounded-lg transition-colors"
+                onClick={() => setOpen(false)}>
+                <Shield className="h-4 w-4" />
+                Compliance
+                <span className="text-[9px] font-semibold uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-rose-500/20 text-rose-300 ml-auto">
+                  Enterprise
+                </span>
+              </Link>
 
               <div className="h-px bg-white/8 my-2" />
               <p className="px-3 text-[10px] font-semibold uppercase tracking-widest text-white/25 pt-1">Produits API</p>
